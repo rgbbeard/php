@@ -88,8 +88,25 @@ function std2_array($stdclass): array {
     return $temp;
 }
 
-function get_config($filename) {
-    $file = file_get_contents(relpath($filename));
-    $json = json_decode($file);
-    return $json;
+function get_config($filename, $decode = true) {
+    $content = file_get_contents($filename);
+    if($decode == true) $content = json_decode($content);
+    return $content;
+}
+
+function var_name($var) {
+    foreach($GLOBALS as $var_name => $value) {
+        if($value === $var) return $var_name;
+        else return "undefined";
+    }
+}
+
+function inspect(...$args) {
+    for($d = 0;$d<sizeof($args);$d++) {
+        $type = gettype($args[$d]);
+        if(preg_match("/(boolean)/", $type)) {
+            $value = boolval($args[$d]) ? true : false;
+        } else $value = $args[$d];
+        echo strval("<pre><b>Name:</b> ".var_name($args[$d]).PHP_EOL."<b>Type:</b> $type".PHP_EOL."<b>Value:</b> $value</pre>").PHP_EOL;
+    }
 }
