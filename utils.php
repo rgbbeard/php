@@ -88,7 +88,7 @@ function std2_array($stdclass): array {
     return $temp;
 }
 
-function get_config($filename, $decode = true) {
+function get_config(string $filename, bool $decode = true) {
     $content = file_get_contents($filename);
     if($decode == true) $content = json_decode($content);
     return $content;
@@ -96,8 +96,10 @@ function get_config($filename, $decode = true) {
 
 function var_name($var) {
     foreach($GLOBALS as $var_name => $value) {
-        if($value === $var) return $var_name;
-        else return "undefined";
+        if($value === $var) {
+            var_dump($var_name);
+            return $var_name;
+        } else return "undefined";
     }
 }
 
@@ -107,6 +109,39 @@ function inspect(...$args) {
         if(preg_match("/(boolean)/", $type)) {
             $value = boolval($args[$d]) ? true : false;
         } else $value = $args[$d];
-        echo strval("<pre><b>Name:</b> ".var_name($args[$d]).PHP_EOL."<b>Type:</b> $type".PHP_EOL."<b>Value:</b> $value</pre>").PHP_EOL;
+        $name = var_name($args[$d]);
+        echo strval("<pre><b><u>Name:</u></b> ".$name.PHP_EOL."<b><u>Type:</u></b> $type".PHP_EOL."<b><u>Value:</u></b> $value</pre>").PHP_EOL;
     }
+}
+
+function read_csv(string $filename, $params = [
+    "explode_rows" => "\n",
+    "explode_fields" => false,
+    "sanitize_fields"=> false,
+    "columns_names" => []
+]):array {
+    $csv = file_get_contents($filename);
+    $erows = strval($params["explode_rows"]);
+    $rows = explode($erows, $csv);
+    if($params["explode_fields"] !== false) {
+        $tnum = 0;
+        $temp = [];
+        foreach($rows as $row) {
+            $efields = strval($params["explode_fields"]);
+            $columns = explode($efields, $row);
+            if(sizeof($params["columns_names"]) > 0) {
+                for($x = 0;$x<sizeof($params["columns_names"]);$x++) {
+                    if($params["sanitize_fields"] !== false && sizeof($params["sanitize_fields"]) > 0) {
+                        foreach($params["sanitize_fields"] as $char => $replace) {                            
+                            $columns[$x] = preg_replace($char, $replace, $columns[$x]);
+                        }
+                    }
+                    $temp[$tnum][$params["columns_names"][$x]] = $columns[$x];
+                }
+            } else $temp[$tnum] = $columns[$x];
+            $tnum++;
+        }
+        return $temp;
+    }
+    return $rows;
 }
