@@ -1,4 +1,6 @@
 <?php
+require_once "utils.php";
+
 class Database {
     private $host;
     private $user;
@@ -6,12 +8,12 @@ class Database {
     private $dbname;
 
     protected $connection;
-    protected $result;
+    protected static $result;
 
     public $debugger;
 
     public function __construct($data = [
-        "host"=> "localhost",
+        "host"=> "hostname",
         "user"=> "username",
         "pass"=> "password",
         "dbname"=> "dbname"
@@ -37,23 +39,29 @@ class Database {
     public function Exec(string $query) {
         $result = mysqli_query($this->connection, $query);
         if($result == true) {
-            $this->result = $result;
+            self::$result = $result;
             return $result;
         } else return false;
     }
 
+    public function Multi(string $multiQuery) {
+        $result = mysqli_multi_query($this->connection, $multiQuery);
+        return $result == true ? true : false;
+    }
+
     public function Rows() {
-        $rows = mysqli_num_rows($this->result);
+        $rows = mysqli_num_rows(self::$result);
         return $rows >= 0 ? $rows : false;
     }
 
-    public function Fetch() {
-        $fetch = mysqli_fetch_array($this->result);
-        if($fetch !== null) return $fetch; 
-        else return false;
+    public static function Fetch($result = null) {
+        $data = is_null($result) ? self::$result : $result;
+        $fetch = mysqli_fetch_array($data);
+        return !is_null($fetch) ? $fetch : false;
     }
 
     public function __destruct() {
         $close = mysqli_close($this->connection);
+        return $close == true ? true : false;
     }
 }
