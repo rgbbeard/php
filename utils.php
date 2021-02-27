@@ -145,3 +145,13 @@ function read_csv(string $filename, $params = [
     }
     return $rows;
 }
+
+function capitalize(string $target) {
+    $words = explode(" ", $target);
+    $temp = [];
+    foreach($words as $word) {
+        $word = strtolower($word);
+        $temp[] = ucfirst($word);
+    }
+    return implode(" ", $temp);
+}
