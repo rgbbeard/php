@@ -157,9 +157,9 @@ function capitalize(string $target) {
 }
 
 function is_email(string $target): bool {
-
+    return preg_match("/([a\.\--z\_]*[a0-z9]+@)([a-z]+\.)([a-z]{2,6})/", $target) ? true : false;
 }
 
-function is_phone(string $target) {
-
+function is_phone(string $target):bool {
+    return preg_match("/((3|0)([0-9]+){9,})/", $target) ? true : false;
 }
