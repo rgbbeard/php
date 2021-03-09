@@ -1,11 +1,11 @@
 <?php
-function delast($target)
+function array_delast($target)
 {
     array_pop($target);
     return $target;
 }
 
-function exclude($target, $element)
+function array_exclude($target, $element)
 {
     $targetPrototype = [];
     for ($x = 0; $x < sizeof($target); $x++) {
@@ -51,7 +51,7 @@ function relpath(string $file): string
         $folders = explode("/", $sanitized_url);
         $tree_length = sizeof($folders);
         #Remove page name
-        $folders = delast($folders);
+        $folders = array_delast($folders);
         for ($x = 0; $x < $tree_length; $x++) {
             if (!empty($folders[$x])) {
                 $file = "../{$file}";
@@ -61,7 +61,7 @@ function relpath(string $file): string
     return $file;
 }
 
-function search_file($dir, $file)
+function search_file(string $dir, string $file)
 {
     if (is_dir($dir)) {
         if ($open = opendir($dir)) {
@@ -78,7 +78,7 @@ function search_file($dir, $file)
     return false;
 }
 
-function std2_array($stdclass): array {
+function std2_array(stdClass $stdclass): array {
     $temp = [];
     foreach($stdclass as $name => $value) {
         if(is_array($value)) {
@@ -154,4 +154,12 @@ function capitalize(string $target) {
         $temp[] = ucfirst($word);
     }
     return implode(" ", $temp);
+}
+
+function is_email(string $target): bool {
+
+}
+
+function is_phone(string $target) {
+
 }
