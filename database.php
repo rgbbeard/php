@@ -62,6 +62,6 @@ class Database {
 
     public function __destruct() {
         $close = mysqli_close($this->connection);
-        return $close == true ? true : false;
+        #var_dump($close);
     }
 }
