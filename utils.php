@@ -1,12 +1,10 @@
 <?php
-function array_delast($target)
-{
+function array_delast($target) {
     array_pop($target);
     return $target;
 }
 
-function array_exclude($target, $element)
-{
+function array_exclude($target, $element) {
     $targetPrototype = [];
     for ($x = 0; $x < sizeof($target); $x++) {
         if ($x == $element) {
@@ -17,8 +15,7 @@ function array_exclude($target, $element)
     return $targetPrototype;
 }
 
-function relpath(string $file): string
-{
+function relpath(string $file): string {
     $current_url = $_SERVER["REQUEST_URI"];
     $specified_page = preg_match("/(\.php)/", $current_url);
     $has_parameters = preg_match("/(\?)/", $current_url);
@@ -61,8 +58,7 @@ function relpath(string $file): string
     return $file;
 }
 
-function search_file(string $dir, string $file)
-{
+function search_file(string $dir, string $file) {
     if (is_dir($dir)) {
         if ($open = opendir($dir)) {
             while (false !== $profiles = readdir($dir)) {
@@ -78,10 +74,10 @@ function search_file(string $dir, string $file)
     return false;
 }
 
-function std2_array(stdClass $stdclass): array {
+function std2_array($stdclass): array {
     $temp = [];
     foreach($stdclass as $name => $value) {
-        if(is_array($value)) {
+        if($value instanceof stdClass) {
             $temp[$name] = std2_array($value);
         } else $temp[$name] = $value;
     }
@@ -146,7 +142,7 @@ function read_csv(string $filename, $params = [
     return $rows;
 }
 
-function capitalize(string $target) {
+function capitalize(string $target): string {
     $words = explode(" ", $target);
     $temp = [];
     foreach($words as $word) {
@@ -160,6 +156,30 @@ function is_email(string $target): bool {
     return preg_match("/([a\.\--z\_]*[a0-z9]+@)([a-z]+\.)([a-z]{2,6})/", $target) ? true : false;
 }
 
-function is_phone(string $target):bool {
-    return preg_match("/((3|0)([0-9]+){9,})/", $target) ? true : false;
+function is_it_phone(string $target, bool $type = false) {
+    if($type === true) {
+        #Code to detect cellular and phone
+    } else return preg_match("/((3|0)([0-9]+){9,})/", $target) ? true : false;
+}
+
+function is_it_fcode(string $target): bool {
+    return preg_match("/(\D{6})(\d\d)(\D\d\d)(\D\d\d)(\d\D)/", $target) ? true : false;
+}
+
+function is_it_postcode(string $target): bool {
+    return preg_match("/(\d+){5}/", $target) ? true : false;
+}
+
+function is_date(string $target): bool {
+    return preg_match("/([\d]+){1,2}[\-|\/]([\d]+){1,2}[\-|\/]([\d]+){4}/", $target) ? true : false;
+}
+
+function get_date(): string {
+    date_default_timezone_set('UTC');
+    return date("d/m/Y");
+}
+
+function get_time(): string {
+    date_default_timezone_set('UTC');
+    return date("G:i:s");
 }
