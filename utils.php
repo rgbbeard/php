@@ -1,9 +1,4 @@
 <?php
-#Prevent users from navigating
-if(strpos($_SERVER["REQUEST_URI"], "utils.php") > -1) {
-    header("Location: https://www.google.com");
-}
-
 function array_delast($target) {
     array_pop($target);
     return $target;
