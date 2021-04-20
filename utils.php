@@ -1,4 +1,9 @@
 <?php
+#Prevent users from navigating
+if(strpos($_SERVER["REQUEST_URI"], "utils.php") > -1) {
+    header("Location: https://www.google.com");
+}
+
 function array_delast($target) {
     array_pop($target);
     return $target;
@@ -158,7 +163,7 @@ function is_email(string $target): bool {
 
 function is_it_phone(string $target, bool $type = false) {
     if($type === true) {
-        #Code to detect cellular and phone
+        #Code to detect if it's mobile or phone
     } else return preg_match("/((3|0)([0-9]+){9,})/", $target) ? true : false;
 }
 
@@ -182,4 +187,28 @@ function get_date(): string {
 function get_time(): string {
     date_default_timezone_set('UTC');
     return date("G:i:s");
+}
+
+function obliviate_sql($target, $resize = {}, ) {
+    $forbidden_words = ["select", "update", "where", "like", "delete", "alter", "date", "username", "password", "or", "and", "not"];
+
+    $target = preg_replace("/[\=|\;|\+|\-|\*|\)|\(|\%|\/]+/", "", $target);
+
+    $words = explode(" ", $target);
+
+    $temp = [];
+
+    foreach($words as $word) {
+        if(!in_array($word, $forbidden_words)) {
+            $temp[] = $word;
+        }
+    }
+
+    $temp = implode("", $temp); 
+
+    if(!empty($resize) && (isset($resize["min"]) && is_integer($resize["min"])) && (isset($resize["max"]) && is_integer($resize["max"]))) {
+        $temp = substr($temp, $resize["min"], $resize["max"]);
+    }
+
+    return $temp;
 }
