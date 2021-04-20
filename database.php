@@ -1,5 +1,5 @@
 <?php
-require_once "utils.php";
+require_once "./utils.php";
 
 class Database {
     private $host;
@@ -30,18 +30,20 @@ class Database {
 
     public function Connect() {
         $connection = mysqli_connect($this->host, $this->user, $this->pass, $this->dbname);
-        if($connection == true) {
+        if($connection) {
             $this->connection = $connection;
             return $connection;
-        } else return false;
+        }
+        return false;
     }
 
     public function Exec(string $query) {
         $result = mysqli_query($this->connection, $query);
-        if($result == true) {
+        if($result) {
             self::$result = $result;
             return $result;
-        } else return false;
+        }
+        return false;
     }
 
     public function Multi(string $multiQuery) {
@@ -62,6 +64,5 @@ class Database {
 
     public function __destruct() {
         $close = mysqli_close($this->connection);
-        #var_dump($close);
     }
 }
