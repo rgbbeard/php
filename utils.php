@@ -190,7 +190,7 @@ function get_time(): string {
     return date("G:i:s");
 }
 
-function obliviate_sql($target, $resize = {}) {
+function obliviate_sql($target, $resize = []) {
     $forbidden_words = ["select", "update", "where", "like", "delete", "alter", "date", "drop", "use", "or", "and", "not"];
 
     $target = preg_replace("/[\=|\;|\+|\-|\*|\)|\(|\%|\/]+/", "", $target);
