@@ -110,42 +110,46 @@ function inspect(...$args) {
     }
 }
 
-function read_csv(string $filename, $options = [
-    "remove_header" => false,
+function read_csv(string $filename, $params = [
     "explode_rows" => "\n",
-    "explode_fields" => ",",
-    "sanitize_fields"=> [],
-    "columns_names" => []
+    "explode_fields" => false,
+    "sanitize_fields"=> false,
+    "columns_names" => array()
 ]):array {
-    $csv = file_get_contents($filename);
-    if(isset($options["explode_rows"]) && gettype($options["explode_rows"]) == "string") {
-        $line_separator = strval($options["explode_rows"]);
-        $rows = explode($line_separator, $csv);
-        if(isset($options["remove_header"]) && gettype($options["remove_header"]) == "boolean" && $options["remove_header"] !== false) {
-            array_shift($rows);
-        }
-        if(isset($options["explode_fields"]) && gettype($options["explode_fields"]) == "string") {
-            $tnum = 0;
-            $temp = [];
-            foreach($rows as $row) {
-                $field_separator = $options["explode_fields"];
-                $columns = explode($field_separator, $row);
-                if(isset($options["columns_names"])  && gettype($options["columns_names"]) == "array" && sizeof($options["columns_names"]) > 0) {
-                    for($x = 0;$x<sizeof($options["columns_names"]);$x++) {
-                        if(isset($options["sanitize_fields"])  && gettype($options["sanitize_fields"]) == "array" && sizeof($options["sanitize_fields"]) > 0) {
-                            foreach($options["sanitize_fields"] as $char => $replace) {                            
-                                $columns[$x] = preg_replace($char, $replace, $columns[$x]);
-                            }
-                        }
-                        $temp[$tnum][$options["columns_names"][$x]] = $columns[$x];
-                    }
-                } else $temp[$tnum] = $columns[$x];
-                $tnum++;
-            }
-            return $temp;
-        }
-        return $rows;
+    $csv = "";
+    try {
+        $csv = file_get_contents($filename);
+    } catch(Exception $e) {
+        var_dump($e->getMessage());
     }
+
+    $erows = strval($params["explode_rows"]);
+    $rows = explode($erows, $csv);
+
+    if(isset($params["explode_fields"]) && gettype($params["explode_fields"]) == "string") {
+        $tnum = 0;
+        $temp = array();
+        foreach($rows as $row) {
+            $efields = strval($params["explode_fields"]);
+            $columns = explode($efields, $row);
+            if(isset($params["columns_names"]) && gettype($params["columns_names"]) == "array" && sizeof($params["columns_names"]) > 0) { #Assign columns names
+                for($x = 0;$x<sizeof($params["columns_names"]);$x++) {
+
+                    if(isset($params["sanitize_fields"]) && $params["sanitize_fields"] !== false && gettype($params["sanitize_fields"]) == "array" && sizeof($params["sanitize_fields"]) > 0) {
+                        foreach($params["sanitize_fields"] as $char => $replace) {                            
+                            $columns[$x] = preg_replace($char, $replace, $columns[$x]);
+                        }
+                    }
+                    $temp[$tnum][$params["columns_names"][$x]] = $columns[$x];
+                }
+            } else { #Just put columns in the array as they are
+                $temp[$tnum] = $columns[$x];
+            }
+            $tnum++;
+        }
+        return $temp;
+    }
+    return $rows;
 }
 
 function capitalize(string $target): string {
