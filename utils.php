@@ -217,3 +217,20 @@ function obliviate_sql($target, $resize = []) {
 
     return $temp;
 }
+
+function simple_hash($rawpw) {
+    $salt = "ca60426850adca67dcec1dd26175c4"; #hash key
+    $saltc = str_split($salt);
+    $startc = str_split($rawpw);
+    $hash = array();
+
+    for($x = 0;$x<sizeof($startc);$x++) {
+        $hash[] = $startc[$x] . $saltc[$x];
+    }
+
+    $hashsize = sizeof($hash);
+
+    $hash = implode("", $hash);
+
+    return substr(base64_encode($hash), 0, ($hashsize-2));
+}
