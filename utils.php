@@ -1,4 +1,10 @@
 <?php
+/*
+PHP minimum version 7.x
+
+Using PHP version 8.x
+*/
+
 function array_delast($target) {
     array_pop($target);
     return $target;
@@ -233,4 +239,8 @@ function simple_hash($rawpw) {
     $hash = implode("", $hash);
 
     return substr(base64_encode($hash), 0, ($hashsize-2));
+}
+
+function timeout_location(string $location, int $timeout) {
+    header("refresh: $timeout;url=" . relpath($location));
 }
