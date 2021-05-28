@@ -190,6 +190,10 @@ function is_date(string $target): bool {
     return preg_match("/([\d]+){1,2}[\-|\/]([\d]+){1,2}[\-|\/]([\d]+){4}/", $target) ? true : false;
 }
 
+function set_timezone(string $timezonename = "UTC") {
+    date_default_timezone_set($timezonename);
+}
+
 function get_date(): string {
     date_default_timezone_set('UTC');
     return date("d/m/Y");
