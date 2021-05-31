@@ -1,7 +1,7 @@
 <?php
 /*
 PHP minimum version 7.x
-Using PHP version 8.x
+Using PHP version 8.0.1
 */
 
 define("TIMEZONE_ROME", "Europe/Rome");
