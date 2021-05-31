@@ -1,9 +1,11 @@
 <?php
 /*
 PHP minimum version 7.x
-
 Using PHP version 8.x
 */
+
+define("TIMEZONE_ROME", "Europe/Rome");
+define("TIMEZONE_UTC", "UTC");
 
 function array_delast($target) {
     array_pop($target);
@@ -190,18 +192,18 @@ function is_date(string $target): bool {
     return preg_match("/([\d]+){1,2}[\-|\/]([\d]+){1,2}[\-|\/]([\d]+){4}/", $target) ? true : false;
 }
 
-function set_timezone(string $timezonename = "UTC") {
+function set_timezone(string $timezonename = TIMEZONE_UTC) {
     date_default_timezone_set($timezonename);
 }
 
-function get_date(): string {
-    date_default_timezone_set('UTC');
-    return date("d/m/Y");
+function get_date(string $timezone = TIMEZONE_UTC, string $separator = "/"): string {
+    date_default_timezone_set($timezone);
+    return date("d{$separator}m{$separator}Y");
 }
 
-function get_time(): string {
-    date_default_timezone_set('UTC');
-    return date("G:i:s");
+function get_time(string $timezone = TIMEZONE_UTC, string $separator = ":"): string {
+    date_default_timezone_set($timezone);
+    return date("G{$separator}i{$separator}s");
 }
 
 function obliviate_sql($target, $resize = []) {
@@ -247,4 +249,17 @@ function simple_hash($rawpw) {
 
 function timeout_location(string $location, int $timeout) {
     header("refresh: $timeout;url=" . relpath($location));
+}
+
+function write_log(string $logfile, $logcontent, bool $userelativepath = false) {
+    if($userelativepath) {
+        $logfile = relpath($logfile);
+    }
+
+    $time = get_time(TIMEZONE_ROME);
+    $date = get_date(TIMEZONE_ROME, "-");
+
+    $logcontent = strval("[$date\t $time]\t " . $logcontent . "\n");
+
+    file_put_contents($logfile, $logcontent, FILE_APPEND);
 }
