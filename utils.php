@@ -23,7 +23,7 @@ function array_exclude($target, $element) {
     return $targetPrototype;
 }
 
-function relpath(string $file): string {
+function relpath(string $file, bool $isLocalhost = false, string $localhostBase = ""): string {
     $current_url = $_SERVER["REQUEST_URI"];
     $specified_page = preg_match("/(\.php)/", $current_url);
     $has_parameters = preg_match("/(\?)/", $current_url);
@@ -62,6 +62,10 @@ function relpath(string $file): string {
                 $file = "../{$file}";
             }
         }
+    }
+    if($isLocalhost) {
+        $localhostBase = defined("localhostBase") ? localhostBase : $localhostBase; 
+        $file = $localhostBase . $file;
     }
     return $file;
 }
