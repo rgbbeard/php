@@ -4,6 +4,10 @@ PHP minimum version 7.x
 Using PHP version 8.0.1
 */
 
+define("ONE_DAY", (86400 * 30));
+define("28_DAYS", (ONE_DAY + 28));
+define("ONE_YEAR", (ONE_DAY + 365));
+
 define("TIMEZONE_ROME", "Europe/Rome");
 define("TIMEZONE_UTC", "UTC");
 
