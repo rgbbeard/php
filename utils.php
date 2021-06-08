@@ -1,7 +1,8 @@
 <?php
 /*
-PHP minimum version 7.x
-Using PHP version 8.0.1
+/    PHP minimum version 7.x
+/    Using PHP version 8.0.1
+/    Author - https://github.com/rgbbeard/
 */
 
 define("TIMEZONE_ROME", "Europe/Rome");
