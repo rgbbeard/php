@@ -4,10 +4,6 @@ PHP minimum version 7.x
 Using PHP version 8.0.1
 */
 
-define("ONE_DAY", (86400 * 30));
-define("28_DAYS", (ONE_DAY + 28));
-define("ONE_YEAR", (ONE_DAY + 365));
-
 define("TIMEZONE_ROME", "Europe/Rome");
 define("TIMEZONE_UTC", "UTC");
 
@@ -27,7 +23,7 @@ function array_exclude($target, $element) {
     return $targetPrototype;
 }
 
-function relpath(string $file, bool $isLocalhost = false, string $localhostBase = ""): string {
+function relpath(string $file): string {
     $current_url = $_SERVER["REQUEST_URI"];
     $specified_page = preg_match("/(\.php)/", $current_url);
     $has_parameters = preg_match("/(\?)/", $current_url);
@@ -66,10 +62,6 @@ function relpath(string $file, bool $isLocalhost = false, string $localhostBase 
                 $file = "../{$file}";
             }
         }
-    }
-    if($isLocalhost) {
-        $localhostBase = defined("localhostBase") ? localhostBase : $localhostBase; 
-        $file = $localhostBase . $file;
     }
     return $file;
 }
@@ -153,7 +145,7 @@ function read_csv(string $filename, $params = [
 
                     if(isset($params["sanitize_fields"]) && $params["sanitize_fields"] !== false && gettype($params["sanitize_fields"]) == "array" && sizeof($params["sanitize_fields"]) > 0) {
                         foreach($params["sanitize_fields"] as $char => $replace) {                            
-                            $columns[$x] = @preg_replace($char, $replace, $columns[$x]);
+                            $columns[$x] = preg_replace($char, $replace, $columns[$x]);
                         }
                     }
                     $temp[$tnum][$params["columns_names"][$x]] = $columns[$x];
@@ -214,6 +206,24 @@ function get_time(string $timezone = TIMEZONE_UTC, string $separator = ":"): str
     return date("G{$separator}i{$separator}s");
 }
 
+function get_x_month(string $month, string $separator = "/", string $timezone = TIMEZONE_ROME): string {
+    if(preg_match("/^[\-|\+]{1}\d+/", $month)) {
+        if(preg_match("/\smonth[s]?/", $month)) {
+            $month = preg_replace("/\smonth[s]?/", "", $month);
+        }
+        $month = preg_match("/[\-|\+]{1}\d+/", $month, $matches);
+        $month = $matches[0];
+        return date(
+            "d{$separator}m{$separator}Y",
+            strtotime(
+                "$month month",
+                strtotime(get_date($timezone, $separator))
+            )
+        );
+    }
+    return "";
+}
+
 function obliviate_sql($target, $resize = []) {
     $forbidden_words = ["select", "update", "where", "like", "delete", "alter", "date", "drop", "use", "or", "and", "not"];
 
@@ -239,7 +249,7 @@ function obliviate_sql($target, $resize = []) {
 }
 
 function simple_hash($rawpw) {
-    $salt = "ca60426850adca67dcec1dd26175c4"; #hash key
+    $salt = ""; #Here goes your hash key
     $saltc = str_split($salt);
     $startc = str_split($rawpw);
     $hash = array();
