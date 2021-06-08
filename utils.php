@@ -8,12 +8,12 @@
 define("TIMEZONE_ROME", "Europe/Rome");
 define("TIMEZONE_UTC", "UTC");
 
-function array_delast($target) {
+function array_delast(array $target) {
     array_pop($target);
     return $target;
 }
 
-function array_exclude($target, $element) {
+function array_exclude(array $target, $element) {
     $targetPrototype = [];
     for ($x = 0; $x < sizeof($target); $x++) {
         if ($x == $element) {
@@ -229,7 +229,7 @@ function get_x_month(string $month, string $separator = "/", string $timezone = 
     return "";
 }
 
-function obliviate_sql($target, $resize = []) {
+function obliviate_sql(string $target, array $resize = []) {
     $forbidden_words = ["select", "update", "where", "like", "delete", "alter", "date", "drop", "use", "or", "and", "not"];
 
     $target = preg_replace("/[\=|\;|\+|\-|\*|\)|\(|\%|\/]+/", "", $target);
@@ -270,7 +270,7 @@ function simple_hash($rawpw) {
     return substr(base64_encode($hash), 0, ($hashsize-2));
 }
 
-function timeout_location(string $location, int $timeout) {
+function timeout_location(string $location, int $timeout = 0) {
     header("refresh: $timeout;url=" . relpath($location));
 }
 
