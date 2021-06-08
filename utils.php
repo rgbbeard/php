@@ -145,7 +145,7 @@ function read_csv(string $filename, $params = [
 
                     if(isset($params["sanitize_fields"]) && $params["sanitize_fields"] !== false && gettype($params["sanitize_fields"]) == "array" && sizeof($params["sanitize_fields"]) > 0) {
                         foreach($params["sanitize_fields"] as $char => $replace) {                            
-                            $columns[$x] = preg_replace($char, $replace, $columns[$x]);
+                            $columns[$x] = @preg_replace($char, $replace, $columns[$x]);
                         }
                     }
                     $temp[$tnum][$params["columns_names"][$x]] = $columns[$x];
