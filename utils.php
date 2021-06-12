@@ -286,3 +286,11 @@ function write_log(string $logfile, $logcontent, bool $userelativepath = false) 
 
     file_put_contents($logfile, $logcontent, FILE_APPEND);
 }
+
+function bin2ascii(string $bin) {
+    $ascii  = "";
+    for($x = 0;$x<strlen($bin);$x++) {
+        $ascii .= chr(intval(substr($bin, $x, 8), 2));
+    }
+    return $ascii;
+}
