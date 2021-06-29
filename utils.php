@@ -127,9 +127,9 @@ function read_csv(string $filename, $params = [
     "explode_rows" => "\n",
     "explode_fields" => false,
     "sanitize_fields"=> [
-    	"/\'/" => "&#39;",
-    	"/\"/" => "&#34;",
-    	"/\;/" => "&#59;"
+        "/\'/" => "\'",
+        "/\"/" => "\"",
+        "/\;/" => "\;"
     ],
     "columns_names" => array()
 ]):array {
