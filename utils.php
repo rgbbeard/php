@@ -163,7 +163,7 @@ function read_csv(string $filename, $params = [
             }
             $tnum++;
         }
-        return $temp[0];
+        return $temp;
     }
     return $rows;
 }
