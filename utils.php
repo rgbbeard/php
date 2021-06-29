@@ -127,9 +127,9 @@ function read_csv(string $filename, $params = [
     "explode_rows" => "\n",
     "explode_fields" => false,
     "sanitize_fields"=> [
-    	"\'" => "&#39;",
-    	"\"" => "&#34;",
-    	"\;" => "&#59;"
+    	"/\'/" => "&#39;",
+    	"/\"/" => "&#34;",
+    	"/\;/" => "&#59;"
     ],
     "columns_names" => array()
 ]):array {
@@ -137,7 +137,7 @@ function read_csv(string $filename, $params = [
     try {
         $csv = file_get_contents($filename);
     } catch(Exception $e) {
-        var_dump($e->getMessage());
+        print_r($e->getMessage());
     }
 
     $erows = strval($params["explode_rows"]);
@@ -151,7 +151,6 @@ function read_csv(string $filename, $params = [
             $columns = explode($efields, $row);
             if(isset($params["columns_names"]) && gettype($params["columns_names"]) == "array" && sizeof($params["columns_names"]) > 0) { #Assign columns names
                 for($x = 0;$x<sizeof($params["columns_names"]);$x++) {
-
                     if(isset($params["sanitize_fields"]) && $params["sanitize_fields"] !== false && gettype($params["sanitize_fields"]) == "array" && sizeof($params["sanitize_fields"]) > 0) {
                         foreach($params["sanitize_fields"] as $char => $replace) {                            
                             $columns[$x] = @preg_replace($char, $replace, $columns[$x]);
@@ -164,10 +163,11 @@ function read_csv(string $filename, $params = [
             }
             $tnum++;
         }
-        return $temp;
+        return $temp[0];
     }
     return $rows;
 }
+
 function capitalize(string $target): string {
     $words = explode(" ", $target);
     $temp = [];
