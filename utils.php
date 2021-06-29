@@ -126,7 +126,11 @@ function inspect(...$args) {
 function read_csv(string $filename, $params = [
     "explode_rows" => "\n",
     "explode_fields" => false,
-    "sanitize_fields"=> false,
+    "sanitize_fields"=> [
+    	"\'" => "&#39;",
+    	"\"" => "&#34;",
+    	"\;" => "&#59;"
+    ],
     "columns_names" => array()
 ]):array {
     $csv = "";
@@ -164,7 +168,6 @@ function read_csv(string $filename, $params = [
     }
     return $rows;
 }
-
 function capitalize(string $target): string {
     $words = explode(" ", $target);
     $temp = [];
