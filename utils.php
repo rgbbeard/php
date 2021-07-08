@@ -189,7 +189,7 @@ function is_it_phone(string $target, bool $type = false) {
 }
 
 function is_it_fcode(string $target): bool {
-    return preg_match("/([\D]{7}[0-9]{2}(\D[0-9]{2}){2}\d\D){1}/", $target) ? true : false;
+    return preg_match("/([\D]{6}[0-9]{2}(\D[0-9]{2}){2}\d\D){1}/", $target) ? true : false;
 }
 
 function is_it_postcode(string $target): bool {
