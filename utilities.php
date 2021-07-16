@@ -1,12 +1,16 @@
 <?php
 /*
-/    PHP minimum version 7.x
-/    Using PHP version 8.0.1
-/    Author - https://github.com/rgbbeard/
+/ Using PHP minimum version 7.x
+/ Written with PHP version 8.0.1
+/ Author - Davide - github.com/rgbbeard/
 */
 
 define("TIMEZONE_ROME", "Europe/Rome");
 define("TIMEZONE_UTC", "UTC");
+
+function contains(string $container, $target) {
+    return strpos($container, $target) > -1 ? true : false;
+}
 
 function array_delast(array $target) {
     array_pop($target);
@@ -24,6 +28,11 @@ function array_exclude(array $target, $element) {
     return $targetPrototype;
 }
 
+######################################################
+# BEWARE! relpath function is not equal to realpath! #
+# This one stands for 'relative path'                #
+# The other one stands for 'absolute path'           #
+######################################################
 function relpath(string $file, bool $isLocalhost = false, string $localhostBase = ""): string {
     $current_url = $_SERVER["REQUEST_URI"];
     $specified_page = preg_match("/(\.php)/", $current_url);
@@ -290,6 +299,9 @@ function write_log(string $logfile, $logcontent, bool $userelativepath = false) 
     file_put_contents($logfile, $logcontent, FILE_APPEND);
 }
 
+########
+# BETA #
+########
 function bin2ascii(string $bin) {
     $ascii  = "";
     for($x = 0;$x<strlen($bin);$x++) {
@@ -297,3 +309,4 @@ function bin2ascii(string $bin) {
     }
     return $ascii;
 }
+?>
