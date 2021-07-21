@@ -309,7 +309,7 @@ function write_log(string $logfile, $logcontent, bool $userelativepath = false) 
 ########
 # BETA #
 ########
-function bin2ascii(string $bin) {
+function bin2_ascii(string $bin) {
     $ascii  = "";
     for($x = 0;$x<strlen($bin);$x++) {
         $ascii .= chr(intval(substr($bin, $x, 8), 2));
