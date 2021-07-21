@@ -87,22 +87,6 @@ function relpath(string $file, bool $isLocalhost = false, string $localhostBase 
     return $file;
 }
 
-function search_file(string $dir, string $file) {
-    if (is_dir($dir)) {
-        if ($open = opendir($dir)) {
-            while (false !== $profiles = readdir($dir)) {
-                if ($profiles !== "." && $profiles  !== ". .") {
-                    if ($profiles ===  $file) {
-                        return $profiles;
-                    }
-                }
-            }
-            closedir($open);
-        }
-    }
-    return false;
-}
-
 function std2_array($stdclass): array {
     $temp = [];
     foreach($stdclass as $name => $value) {
