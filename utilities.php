@@ -12,6 +12,13 @@ function contains(string $container, $target) {
     return strpos($container, $target) > -1 ? true : false;
 }
 
+function is_declared($variable, bool $check_non_empty_content = false) {
+    if($check_non_empty_content) {
+        return isset($variable) && !empty($variable);
+    }
+    return isset($variable);
+}
+
 function array_delast(array $target) {
     array_pop($target);
     return $target;
