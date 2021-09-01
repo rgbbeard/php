@@ -1,5 +1,11 @@
 <?php
-# Used to convert json data (instance of stdClass) to associative array
+/*
+/ Minimum PHP version 7.x
+/ Using PHP version 7.3.x
+/ Author - Davide - 31/08/2021
+*/
+
+# Used to convert json data (instance of stdClass) into an associative array
 function std2_array($stdclass): array {
     $temp = [];
     foreach($stdclass as $name => $value) {
@@ -10,7 +16,7 @@ function std2_array($stdclass): array {
     return $temp;
 }
 
-class JSONMaid {
+class LocalConnector {
 	private $connection = null;
 	private string $database = "";
 
@@ -21,20 +27,14 @@ class JSONMaid {
 
 			$data = file_get_contents($database);
 
-			$this->connection = std2_array($this->from_json($data));
+			$data = json_decode($data);
+
+			$this->connection = std2_array($data);
 		}
 	}
 
-	private function to_json($data) {
-		return base64_encode($data);
-	}
-
-	private function from_json($data) {
-		return base64_decode($data);
-	}
-
 	private function save() {
-		$data = $this->to_json($this->connection);
+		$data = json_encode($this->connection);
 		
 		try {
 			return file_put_contents($this->database, $data) ? true : false;
@@ -47,6 +47,18 @@ class JSONMaid {
 
 	public function get_records() {
 		return $this->connection["data"];
+	}
+
+	public function delete_records() {
+		try {
+			unset($this->connection["data"]);
+
+			return $this->save();
+		} catch(Exception $e) {
+			echo $e->getMessage();
+		}
+
+		return false;
 	}
 
 	public function records_count() {
@@ -82,14 +94,13 @@ class JSONMaid {
 
 	public function put_record($data) {
 		$can_be_added = true;
-		
 		$data = $this->get_records();
 		$records_count = $this->records_count();
 
 		for($x = 1;$x<$records_count+1;$x++) {
 			$row = $this->get_records()[strval($x)];
 
-			if($row == $data) {
+			if($row === $data) {
 				$can_be_added = false;
 				break;
 			}
@@ -106,6 +117,8 @@ class JSONMaid {
 	}
 
 	public function __destruct() {
+		$this->save();
+
 		$this->connection = null;
 		$this->database = "";
 	}
