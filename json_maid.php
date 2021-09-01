@@ -80,30 +80,26 @@ class JSONMaid {
 		return false;
 	}
 
-	public function put_record($data, bool $ignore_same_badge = false) {
+	public function put_record($data) {
 		$can_be_added = true;
+		
+		$data = $this->get_records();
+		$records_count = $this->records_count();
 
-		if(!isset($data["badge"]) || empty($data["badge"])) {
-			return false;
-		} else {
-			$data = $this->get_records();
-			$records_count = $this->records_count();
+		for($x = 1;$x<$records_count+1;$x++) {
+			$row = $this->get_records()[strval($x)];
 
-			for($x = 1;$x<$records_count+1;$x++) {
-				$row = $this->get_records()[strval($x)];
-
-				if($row["badge"] === $data["badge"] && !$ignore_same_badge) {
-					$can_be_added = false;
-					break;
-				}
+			if($row == $data) {
+				$can_be_added = false;
+				break;
 			}
+		}
 
-			if($can_be_added) {
-				$uid = strval($records_count+1);
+		if($can_be_added) {
+			$uid = strval($records_count+1);
 
-				$this->connection["data"][$uid] = $data;
-				return $this->save();
-			}
+			$this->connection["data"][$uid] = $data;
+			return $this->save();
 		}
 
 		return $can_be_added;
