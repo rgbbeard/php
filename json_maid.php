@@ -10,7 +10,7 @@ function std2_array($stdclass): array {
     return $temp;
 }
 
-class LocalConnector {
+class JSONMaid {
 	private $connection = null;
 	private string $database = "";
 
@@ -51,18 +51,6 @@ class LocalConnector {
 
 	public function records_count() {
 		return sizeof($this->connection["data"]);
-	}
-
-	public function get_user_by_badge(string $badge) {
-		$data = $this->get_records();
-
-		foreach($data as $row) {
-			if(strval($row["badge"]) === $badge) {
-				return $row;
-			}
-		}
-
-		return null;
 	}
 
 	public function delete_record(int $id) {
