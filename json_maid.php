@@ -118,9 +118,6 @@ class LocalConnector {
 
 	public function __destruct() {
 		$this->save();
-
-		$this->connection = null;
-		$this->database = "";
 	}
 }
 ?>
