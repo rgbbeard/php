@@ -7,16 +7,18 @@
 
 # Used to convert json data (instance of stdClass) into an associative array
 function std2_array($stdclass): array {
-    $temp = [];
-    foreach($stdclass as $name => $value) {
-        if($value instanceof stdClass) {
-            $temp[$name] = std2_array($value);
-        } else $temp[$name] = $value;
-    }
-    return $temp;
+    	$temp = [];
+	foreach($stdclass as $name => $value) {
+		if($value instanceof stdClass) {
+            		$temp[$name] = std2_array($value);
+        	} else {
+			$temp[$name] = $value;
+		}
+    	}
+    	return $temp;
 }
 
-class LocalConnector {
+class JSONMaid {
 	private $connection = null;
 	private string $database = "";
 
@@ -51,7 +53,7 @@ class LocalConnector {
 
 	public function delete_records() {
 		try {
-			unset($this->connection["data"]);
+			$this->connection["data"] = (object) null;
 
 			return $this->save();
 		} catch(Exception $e) {
