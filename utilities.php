@@ -35,11 +35,6 @@ function array_exclude(array $target, $element) {
     return $targetPrototype;
 }
 
-######################################################
-# BEWARE! relpath function is not equal to realpath! #
-# This one stands for 'relative path'                #
-# The other one stands for 'absolute path'           #
-######################################################
 function relpath(string $file, bool $isLocalhost = false, string $localhostBase = ""): string {
     $current_url = $_SERVER["REQUEST_URI"];
     $specified_page = preg_match("/(\.php)/", $current_url);
@@ -232,28 +227,18 @@ function get_x_month(string $month, string $separator = "/", string $timezone = 
     return "";
 }
 
-function obliviate_sql(string $target, array $resize = []) {
-    $forbidden_words = ["select", "update", "where", "like", "delete", "alter", "date", "drop", "use", "or", "and", "not"];
+function clear_sql_keywords(string $target, array $resize = []): string {
+    $forbidden_words = ["select", "update", "where", "like", "delete", "alter", "date", "drop", "use", "or", "and", "not", "use", "=", ";", "+", "-", "*", ")", "(", "%", "/", "]", "[", "{", "}"];
 
-    $target = preg_replace("/[\=|\;|\+|\-|\*|\)|\(|\%|\/]+/", "", $target);
-
-    $words = explode(" ", $target);
-
-    $temp = [];
-
-    foreach($words as $word) {
-        if(!in_array($word, $forbidden_words)) {
-            $temp[] = $word;
-        }
+    foreach($forbidden_words as $word) {
+        $target = str_replace($word, "", $target);
     }
-
-    $temp = implode("", $temp); 
 
     if(!empty($resize) && (isset($resize["min"]) && is_integer($resize["min"])) && (isset($resize["max"]) && is_integer($resize["max"]))) {
-        $temp = substr($temp, $resize["min"], $resize["max"]);
+        $target = substr($target, $resize["min"], $resize["max"]);
     }
 
-    return $temp;
+    return $target;
 }
 
 function simple_hash($rawpw) {
