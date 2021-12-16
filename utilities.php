@@ -17,6 +17,7 @@ function is_declared($variable, bool $check_non_empty_content = false) {
     if($check_non_empty_content) {
         return isset($variable) && !empty($variable);
     }
+    
     return isset($variable);
 }
 
@@ -26,14 +27,15 @@ function array_delast(array $target) {
 }
 
 function array_exclude(array $target, $element) {
-    $targetPrototype = [];
+    $temp = [];
     for ($x = 0; $x < sizeof($target); $x++) {
         if ($x == $element) {
             continue;
         }
-        $targetPrototype[] = $target[$x];
+        $temp[] = $target[$x];
     }
-    return $targetPrototype;
+    
+    return $temp;
 }
 
 function relpath(string $file, bool $isLocalhost = false, string $localhostBase = ""): string {
@@ -80,6 +82,7 @@ function relpath(string $file, bool $isLocalhost = false, string $localhostBase 
         $localhostBase = defined("localhostBase") ? localhostBase : $localhostBase; 
         $file = $localhostBase . $file;
     }
+    
     return $file;
 }
 
@@ -88,14 +91,21 @@ function std2_array($stdclass): array {
     foreach($stdclass as $name => $value) {
         if($value instanceof stdClass) {
             $temp[$name] = std2_array($value);
-        } else $temp[$name] = $value;
+        } else {
+            $temp[$name] = $value;
+        }
     }
+    
     return $temp;
 }
 
 function get_config(string $filename, bool $decode = true) {
     $content = file_get_contents($filename);
-    if($decode == true) $content = json_decode($content);
+    
+    if($decode == true) {
+        $content = json_decode($content);
+    }
+    
     return $content;
 }
 
@@ -104,16 +114,22 @@ function var_name($var) {
         if($value === $var) {
             var_dump($var_name);
             return $var_name;
-        } else return "undefined";
+        }
+        
+        return "undefined";
     }
 }
 
 function inspect(...$args) {
     for($d = 0;$d<sizeof($args);$d++) {
         $type = gettype($args[$d]);
+        
         if(preg_match("/(boolean)/", $type)) {
             $value = boolval($args[$d]) ? true : false;
-        } else $value = $args[$d];
+        } else {
+            $value = $args[$d];
+        }
+        
         $name = var_name($args[$d]);
         echo strval("<pre><b><u>Name:</u></b> ".$name.PHP_EOL."<b><u>Type:</u></b> $type".PHP_EOL."<b><u>Value:</u></b> $value</pre>").PHP_EOL;
     }
@@ -130,6 +146,7 @@ function read_csv(string $filename, $params = [
     "columns_names" => array()
 ]):array {
     $csv = "";
+    
     try {
         $csv = file_get_contents($filename);
     } catch(Exception $e) {
@@ -142,9 +159,11 @@ function read_csv(string $filename, $params = [
     if(isset($params["explode_fields"]) && gettype($params["explode_fields"]) == "string") {
         $tnum = 0;
         $temp = array();
+       
         foreach($rows as $row) {
             $efields = strval($params["explode_fields"]);
             $columns = explode($efields, $row);
+            
             if(isset($params["columns_names"]) && gettype($params["columns_names"]) == "array" && sizeof($params["columns_names"]) > 0) { #Assign columns names
                 for($x = 0;$x<sizeof($params["columns_names"]);$x++) {
                     if(isset($params["sanitize_fields"]) && $params["sanitize_fields"] !== false && gettype($params["sanitize_fields"]) == "array" && sizeof($params["sanitize_fields"]) > 0) {
@@ -157,43 +176,50 @@ function read_csv(string $filename, $params = [
             } else { #Just put columns in the array as they are
                 $temp[$tnum] = $columns;
             }
+            
             $tnum++;
         }
+        
         return $temp;
     }
+    
     return $rows;
 }
 
 function capitalize(string $target): string {
     $words = explode(" ", $target);
     $temp = [];
+    
     foreach($words as $word) {
         $word = strtolower($word);
         $temp[] = ucfirst($word);
     }
+    
     return implode(" ", $temp);
 }
 
-function is_email(string $target): bool {
-    return preg_match("/([a\.\--z\_]*[a0-z9]+@)([a-z]+\.)([a-z]{2,6})/", $target) ? true : false;
+function is_email(string $target) {
+    return preg_match("/([a\.\--z\_]*[a0-z9]+@)([a-z]+\.)([a-z]{2,6})/", $target);
 }
 
 function is_it_phone(string $target, bool $type = false) {
     if($type === true) {
         #Code to detect if it's mobile or phone
-    } else return preg_match("/((3|0)([0-9]+){9,})/", $target) ? true : false;
+    }
+    
+    return preg_match("/((3|0)([0-9]+){9,})/", $target);
 }
 
-function is_it_fcode(string $target): bool {
-    return preg_match("/([\D]{6}[0-9]{2}(\D[0-9]{2}){2}\d\D){1}/", $target) ? true : false;
+function is_it_fcode(string $target) {
+    return preg_match("/([\D]{6}[0-9]{2}(\D[0-9]{2}){2}\d\D){1}/", $target);
 }
 
-function is_it_postcode(string $target): bool {
-    return preg_match("/(\d+){5}/", $target) ? true : false;
+function is_it_postcode(string $target) {
+    return preg_match("/(\d+){5}/", $target);
 }
 
-function is_date(string $target): bool {
-    return preg_match("/([\d]+){1,2}[\-|\/]([\d]+){1,2}[\-|\/]([\d]+){4}/", $target) ? true : false;
+function is_date(string $target) {
+    return preg_match("/([\d]+){1,2}[\-|\/]([\d]+){1,2}[\-|\/]([\d]+){4}/", $target);
 }
 
 function set_timezone(string $timezonename = TIMEZONE_UTC) {
@@ -215,8 +241,10 @@ function get_x_month(string $month, string $separator = "/", string $timezone = 
         if(preg_match("/\smonth[s]?/", $month)) {
             $month = preg_replace("/\smonth[s]?/", "", $month);
         }
+        
         $month = preg_match("/[\-|\+]{1}\d+/", $month, $matches);
         $month = $matches[0];
+        
         return date(
             "d{$separator}m{$separator}Y",
             strtotime(
@@ -225,6 +253,7 @@ function get_x_month(string $month, string $separator = "/", string $timezone = 
             )
         );
     }
+    
     return "";
 }
 
@@ -281,9 +310,11 @@ function write_log(string $logfile, $logcontent, bool $userelativepath = false) 
 ########
 function bin2_ascii(string $bin) {
     $ascii  = "";
+    
     for($x = 0;$x<strlen($bin);$x++) {
         $ascii .= chr(intval(substr($bin, $x, 8), 2));
     }
+    
     return $ascii;
 }
 ?>
