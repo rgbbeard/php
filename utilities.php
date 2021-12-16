@@ -154,7 +154,7 @@ function read_csv(string $filename, $params = [
                     $temp[$tnum][$params["columns_names"][$x]] = $columns[$x];
                 }
             } else { #Just put columns in the array as they are
-                $temp[$tnum] = $columns[$x];
+                $temp[$tnum] = $columns;
             }
             $tnum++;
         }
