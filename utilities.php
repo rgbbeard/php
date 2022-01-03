@@ -237,10 +237,11 @@ function get_time(string $timezone = TIMEZONE_UTC, string $separator = ":"): str
 }
 
 function is_negative($num = 0) {
-    if(!is_numeric($num)) {
-        return null;
-    }
-	return preg_match("/^-/", strval($num));
+	if(!is_numeric($num)) {
+		return null;
+	}
+	
+	return preg_match("/^-/", strval($num*-1));
 }
 
 function sum(...$args) {
@@ -262,6 +263,10 @@ function sub(bool $to_int = false, ...$args) {
 		$num = $args[$x];
 
 		if(is_numeric($num)) {
+			if(!preg_match("/^-/", strval($num))) {
+				$num *= -1; # Make the number negative
+			}
+			
 			$temp += floatval($num);
 		}
 	}
