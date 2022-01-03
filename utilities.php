@@ -236,25 +236,62 @@ function get_time(string $timezone = TIMEZONE_UTC, string $separator = ":"): str
     return date("G{$separator}i{$separator}s");
 }
 
-function get_x_month(string $month, string $separator = "/", string $timezone = TIMEZONE_ROME): string {
-    if(preg_match("/^[\-|\+]{1}\d+/", $month)) {
-        if(preg_match("/\smonth[s]?/", $month)) {
-            $month = preg_replace("/\smonth[s]?/", "", $month);
-        }
-        
-        $month = preg_match("/[\-|\+]{1}\d+/", $month, $matches);
-        $month = $matches[0];
-        
-        return date(
-            "d{$separator}m{$separator}Y",
-            strtotime(
-                "$month month",
-                strtotime(get_date($timezone, $separator))
-            )
-        );
+function is_negative($num = 0) {
+    if(!is_numeric($num)) {
+        return null;
     }
-    
-    return "";
+	return preg_match("/^-/", strval($num));
+}
+
+function sum(...$args) {
+	$temp = [];
+
+	foreach($args as $num) {
+		if(is_numeric($num)) {
+			$temp[] = $num;
+		}
+	}
+
+	return array_sum($temp);
+}
+
+function sub(bool $to_int = false, ...$args) {
+	$temp = @isset($args[0]) && is_numeric($args[0]) ? floatval($args[0]) : 0;
+
+	for($x = 1;$x<sizeof($args);$x++) {
+		$num = $args[$x];
+
+		if(is_numeric($num)) {
+			$temp += floatval($num);
+		}
+	}
+
+	return $to_int ? intval($temp) : $temp;
+}
+
+function get_x_year(int $years = 0) {
+	$dd = intval(date("j"));
+	$mm = intval(date("n"));
+	$yy = is_negative($years) ? sub(intval(date("Y")), $years) : sum(intval(date("Y")), $years);
+	$h = intval(preg_replace("/^0/", "", date("H")));
+	$m = intval(preg_replace("/^0/", "", date("i")));
+	$s = intval(preg_replace("/^0/", "", date("s")));
+
+	return date("Y", mktime($h, $m, $s, $mm, $dd, $yy));
+}
+
+function get_x_month(int $months = 0, bool $get_name = false) {
+	$dd = intval(date("j"));
+	$mm = intval(date("n"));
+	$yy = is_negative($months) ? sub(true, intval(date("Y")), $months) : sum(intval(date("Y")), $months);
+	$h = intval(preg_replace("/^0/", "", date("H")));
+	$m = intval(preg_replace("/^0/", "", date("i")));
+	$s = intval(preg_replace("/^0/", "", date("s")));
+
+	$formatter = $get_name ? "F" : "m";
+	$month = date($formatter, mktime($h, $m, $s, $mm, $dd, $yy));
+
+	return $month;
 }
 
 function clear_sql_keywords(string $target, array $resize = []): string {
