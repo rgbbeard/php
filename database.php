@@ -1,68 +1,66 @@
 <?php
-require_once "./utils.php";
+/*
+/ Minimum PHP version 7.x
+/ Using PHP version 8.1.1
+/ Author - Davide - github.com/rgbbeard/
+*/
 
-class Database {
-    private $host;
-    private $user;
-    private $pass;
-    private $dbname;
+class MySQL {
+	public $connection = null;
+	protected $prepare = null;
+	public $result = [];
+	public $rows = 0;
 
-    protected $connection;
-    protected static $result;
+	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "", string $dbname = "localhost", string $port = "3306") {
+		if(empty($this->connection) || !($this->connection instanceof PDO)) {
+			return $this->connect($hostname, $username, $password, $dbname, $port);
+		}
+		return $this->connection;
+	}
 
-    public $debugger;
+	public function __destruct() { # No need to close connection manually
+		$this->connection = null;
+	}
 
-    public function __construct($data = [
-        "host"=> "hostname",
-        "user"=> "username",
-        "pass"=> "password",
-        "dbname"=> "dbname"
-    ]) {
-        foreach($data as $d) {
-            if(gettype($d) !== "string") throw new Exception("Connection data must be string type.");
-        }
-        $this->host = $data["host"];
-        $this->user = $data["user"];
-        $this->pass = $data["pass"];
-        $this->dbname = $data["dbname"];
-        $this->Connect();
+    public static function is_database($connection): bool {
+        return ($connection instanceof PDO);
     }
 
-    public function Connect() {
-        $connection = mysqli_connect($this->host, $this->user, $this->pass, $this->dbname);
-        if($connection) {
-            $this->connection = $connection;
-            return $connection;
-        }
-        return false;
-    }
+	protected function connect(string $hostname, string $username, string $password, string $dbname, string $port) { # No need to open connection manually
+		try {
+			$this->connection = new PDO("mysql:host=$hostname;dbname=$dbname;port=$port", $username, $password);
+		} catch(PDOException $ce) {
+			print_r($ce->getMessage());
+		}
+		return $this->connection;
+	}
 
-    public function Exec(string $query) {
-        $result = mysqli_query($this->connection, $query);
-        if($result) {
-            self::$result = $result;
-            return $result;
-        }
-        return false;
-    }
+	public function execute(string $query) {
+		if(!empty($query)) {
+			try {
+				$this->prepare = $this->connection->prepare($query);
+				$sql_exec = $this->prepare->execute();
+				if($sql_exec) {
+					$this->get_rows();
+					if($this->rows > 0) {
+						$this->get_result();
+					}
+				}
+				return $sql_exec;
+			} catch(Exception $e) {
+				print_r($e->getMessage());
+			}
+		}
 
-    public function Multi(string $multiQuery) {
-        $result = mysqli_multi_query($this->connection, $multiQuery);
-        return $result == true ? true : false;
-    }
+		return null;
+	}
 
-    public function Rows() {
-        $rows = mysqli_num_rows(self::$result);
-        return $rows >= 0 ? $rows : false;
-    }
+	public function get_rows() {
+		$this->rows = $this->prepare->rowCount();
+	}
 
-    public static function Fetch($result = null) {
-        $data = is_null($result) ? self::$result : $result;
-        $fetch = mysqli_fetch_array($data);
-        return !is_null($fetch) ? $fetch : false;
-    }
-
-    public function __destruct() {
-        $close = mysqli_close($this->connection);
-    }
+	public function get_result() {
+		$this->result = $this->prepare->fetch(PDO::FETCH_ASSOC);
+	}
 }
+?>
