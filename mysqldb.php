@@ -11,7 +11,7 @@ class MySQL {
 	public $result = [];
 	public $rows = 0;
 
-	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "", string $dbname = "localhost", string $port = "3306") {
+	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "", string $dbname = "dbname", string $port = "3306") {
 		if(empty($this->connection) || !($this->connection instanceof PDO)) {
 			return $this->connect($hostname, $username, $password, $dbname, $port);
 		}
@@ -22,9 +22,9 @@ class MySQL {
 		$this->connection = null;
 	}
 
-    public static function is_database($connection): bool {
-        return ($connection instanceof PDO);
-    }
+	public function is_connected(): bool {
+		return ($this->connection instanceof PDO);
+	}
 
 	protected function connect(string $hostname, string $username, string $password, string $dbname, string $port) { # No need to open connection manually
 		try {
@@ -51,16 +51,21 @@ class MySQL {
 				print_r($e->getMessage());
 			}
 		}
-
-		return null;
+		return false;
 	}
 
 	public function get_rows() {
 		$this->rows = $this->prepare->rowCount();
+		return $this->rows;
 	}
 
 	public function get_result() {
 		$this->result = $this->prepare->fetch(PDO::FETCH_ASSOC);
+		return $this->result;
+	}
+
+	public static function ifnull($target, $value) {
+		return preg_match("/^null$/gmi", strval($target)) || is_null($target) ? $value : $target;
 	}
 }
 ?>
