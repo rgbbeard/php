@@ -11,7 +11,7 @@ class MySQL {
 	public $result = [];
 	public $rows = 0;
 
-	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "", string $dbname = "dbname", string $port = "3306") {
+	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "root", string $dbname = "Sql1481730_2", string $port = "3306") {
 		if(empty($this->connection) || !($this->connection instanceof PDO)) {
 			return $this->connect($hostname, $username, $password, $dbname, $port);
 		}
@@ -43,7 +43,9 @@ class MySQL {
 				if($sql_exec) {
 					$this->get_rows();
 					if($this->rows > 0) {
-						$this->get_result();
+						while($sql_result = $this->get_result()) {
+							$this->result[] = $sql_result;
+						}
 					}
 				}
 				return $sql_exec;
@@ -60,8 +62,7 @@ class MySQL {
 	}
 
 	public function get_result() {
-		$this->result = $this->prepare->fetch(PDO::FETCH_ASSOC);
-		return $this->result;
+		return $this->prepare->fetch(PDO::FETCH_ASSOC);
 	}
 
 	public static function ifnull($target, $value) {
