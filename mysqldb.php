@@ -11,7 +11,7 @@ class MySQL {
 	public $result = [];
 	public $rows = 0;
 
-	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "root", string $dbname = "Sql1481730_2", string $port = "3306") {
+	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "root", string $dbname = "dbname", string $port = "3306") {
 		if(empty($this->connection) || !($this->connection instanceof PDO)) {
 			return $this->connect($hostname, $username, $password, $dbname, $port);
 		}
