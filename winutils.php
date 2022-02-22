@@ -49,6 +49,7 @@ function stop_process(int $process_id, bool $force = false) {
 	shell_exec("taskkill $force /PID $process_id");
 }
 
+# Requires unzip.php in the same directory
 function unzip(string $file_path, string $destination_path) {
 	shell_exec("php unzip.php $file_path $destination_path");
 }
