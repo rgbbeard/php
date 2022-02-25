@@ -15,7 +15,7 @@ function get_cwd() {
 }
 
 function get_active_processes(bool $remove_header = false) {
-	$processes = shell_exec("ps -A");
+	$processes = shell_exec("ps -Al");
 	$processes = explode("\n", trim($processes));
 
 	$result = [];
@@ -46,7 +46,7 @@ function get_active_processes(bool $remove_header = false) {
 }
 
 function find_process(string $process_name = "", bool $remove_header = false) {
-	$processes = shell_exec("ps -A | grep $process_name");
+	$processes = shell_exec("ps -Al | grep $process_name");
 	$processes = explode("\n", trim($processes));
 
 	$result = [];
@@ -77,9 +77,21 @@ function find_process(string $process_name = "", bool $remove_header = false) {
 }
 
 function process_is_daemon(array $process_info) {
-	$cmd = $process_info[3];
+	$ppid = $process_info[4];
 
-	return preg_match("/d$/", explode("/", $cmd)[0]) || preg_match("/d$/", $cmd);
+	return intval($ppid) === 1;
+}
+
+function process_is_system(array $process_info) {
+	$ppid = $process_info[4];
+
+	return intval($ppid) === 2;
+}
+
+function process_is_vital(array $process_info) {
+	$ppid = $process_info[4];
+
+	return intval($ppid) === 0;
 }
 
 function kill_process(int $pid) {
