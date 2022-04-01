@@ -5,25 +5,11 @@
 / Author - Davide - 31/08/2021
 */
 
-# Used to convert json data (instance of stdClass) into an associative array
-function std2_array($stdclass): array {
-    	$temp = [];
-	foreach($stdclass as $name => $value) {
-		if($value instanceof stdClass) {
-            		$temp[$name] = std2_array($value);
-        	} else {
-			$temp[$name] = $value;
-		}
-    	}
-    	return $temp;
-}
-
 class JSONMaid {
 	private $connection = null;
 	private string $database = "";
 
 	public function __construct(string $database) {
-		// Verify that the given filename is an actual json file
 		if(!empty($database) && is_file($database) && preg_match("/(\.json){1}$/", $database)) {
 			$this->database = $database;
 
@@ -31,7 +17,7 @@ class JSONMaid {
 
 			$data = json_decode($data);
 
-			$this->connection = std2_array($data);
+			$this->connection = std2_array($data); # Requires utilities.php
 		}
 	}
 
@@ -52,74 +38,60 @@ class JSONMaid {
 	}
 
 	public function delete_records() {
-		try {
-			$this->connection["data"] = (object) null;
+		$this->connection["data"] = (object) null;
 
-			return $this->save();
-		} catch(Exception $e) {
-			echo $e->getMessage();
-		}
-
-		return false;
+		return $this->save();
 	}
 
 	public function records_count() {
-		return sizeof($this->connection["data"]);
+		return count($this->connection["data"]);
 	}
 
-	public function delete_record(int $id) {
-		$data = $this->get_records();
+	public function delete_record($index) {
+		unset($this->connection["data"][$index]);
 
-		try {
-			unset($data[strval($id)]);
-
-			return $this->save();
-		} catch(Exception $e) {
-			echo $e->getMessage();
-		}
-
-		return false;
+		return $this->save();
 	}
 
-	public function update_record($old_record, $new_record) {
+	public function update_record($old_data, $new_data) {
 		$data = $this->get_records();
 
-		foreach($data as $row) {
-			if($row == $old_record) {
-				$row = $new_record;
-				return true;
+		foreach($data as $index => $d) {
+			if($d === $old_data) {
+				$this->connection["data"][$index] = $new_data;
+				return $this->save();
 			}
 		}
 
 		return false;
 	}
 
-	public function put_record($data) {
+	public function get_record($record) {
+		return $this->get_records()[$record];
+	}
+
+	public function put_record($index, $data) {
 		$can_be_added = true;
-		$data = $this->get_records();
-		$records_count = $this->records_count();
+		$records = $this->get_records();
+		$records_count = count($data);
 
-		for($x = 1;$x<$records_count+1;$x++) {
-			$row = $this->get_records()[strval($x)];
-
-			if($row === $data) {
+		foreach($records as $i => $d) {
+			if($i === $index) {
 				$can_be_added = false;
 				break;
 			}
 		}
 
 		if($can_be_added) {
-			$uid = strval($records_count+1);
+			if(empty($index)) {
+				$index = strval($records_count+1);
+			}
 
-			$this->connection["data"][$uid] = $data;
+			$this->connection["data"][$index] = $data;
 			return $this->save();
 		}
 
 		return $can_be_added;
-	}
-
-	public function __destruct() {
-		$this->save();
 	}
 }
 ?>
