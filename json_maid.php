@@ -53,11 +53,11 @@ class JSONMaid {
 		return $this->save();
 	}
 
-	public function update_record($old_data, $new_data) {
+	public function update_record($index, $new_data) {
 		$data = $this->get_records();
 
-		foreach($data as $index => $d) {
-			if($d === $old_data) {
+		foreach($data as $i => $d) {
+			if($i === $index) {
 				$this->connection["data"][$index] = $new_data;
 				return $this->save();
 			}
