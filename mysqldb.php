@@ -2,14 +2,15 @@
 /*
 / Minimum PHP version 7.x
 / Using PHP version 8.1.1
-/ Author - Davide - github.com/rgbbeard/
+/ Author - Davide
+/ Git - github.com/rgbbeard/
 */
 
 class MySQL {
-	public $connection = null;
+	public ?PDO $connection = null;
 	protected $prepare = null;
 	public $result = [];
-	public $rows = 0;
+	public int $rows = 0;
 
 	public function __construct(string $hostname = "localhost", string $username = "root", string $password = "root", string $dbname = "dbname", string $port = "3306") {
 		if(empty($this->connection) || !($this->connection instanceof PDO)) {
@@ -54,6 +55,12 @@ class MySQL {
 			}
 		}
 		return false;
+	}
+
+	public function clear() {
+		$this->prepare = null;
+		$this->result = [];
+		$this->rows = 0;
 	}
 
 	public function get_rows() {
