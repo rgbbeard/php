@@ -39,6 +39,7 @@ class MySQL {
 	public function execute(string $query) {
 		if(!empty($query)) {
 			try {
+				$this->clear();
 				$this->prepare = $this->connection->prepare($query);
 				$sql_exec = $this->prepare->execute();
 				if($sql_exec) {
