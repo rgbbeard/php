@@ -25,7 +25,7 @@ class JSONMaid {
 		$data = json_encode($this->connection);
 		
 		try {
-			return file_put_contents($this->database, $data) ? true : false;
+			return file_put_contents($this->database, $data);
 		} catch(Exception $e) {
 			echo $e->getMessage();
 		}
@@ -53,45 +53,53 @@ class JSONMaid {
 		return $this->save();
 	}
 
-	public function update_record($index, $new_data) {
+	public function update_record($record, $new_data, $new_name = false) {
 		$data = $this->get_records();
 
-		foreach($data as $i => $d) {
-			if($i === $index) {
-				$this->connection["data"][$index] = $new_data;
-				return $this->save();
-			}
+		$this->connection["data"][$record] = $new_data;
+
+		$this->delete_record($record);
+
+		if(!empty($new_name)) {
+			$this->put_record($new_name, $new_data);
 		}
 
-		return false;
+		return $this->save();
 	}
 
 	public function get_record($record) {
 		return $this->get_records()[$record];
 	}
 
-	public function put_record($index, $data) {
+	public function put_record($record, $data) {
 		$can_be_added = true;
-		$records = $this->get_records();
 		$records_count = count($data);
 
-		foreach($records as $i => $d) {
-			if($i === $index) {
+		foreach($this->get_records() as $i => $d) {
+			if($i === $record) {
 				$can_be_added = false;
 				break;
 			}
 		}
 
 		if($can_be_added) {
-			if(empty($index)) {
-				$index = strval($records_count+1);
-			}
-
-			$this->connection["data"][$index] = $data;
+			$this->connection["data"][$record] = $data;
 			return $this->save();
 		}
 
 		return $can_be_added;
+	}
+
+	public function get_index_of($record) {
+		$x = 0;
+		foreach($this->get_records() as $i => $d) {
+			if($i === $record) {
+				return $x;
+			}
+			$x++;
+		}
+
+		return null;
 	}
 }
 ?>
