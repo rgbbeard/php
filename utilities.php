@@ -9,6 +9,79 @@
 define("TIMEZONE_ROME", "Europe/Rome");
 define("TIMEZONE_UTC", "UTC");
 
+function dump(...$items) {
+    $debug = "<pre style='background-color:#f003;padding:10px;'>";
+
+    foreach($items as $item) {
+        $value = print_r($item, true);
+
+        if(is_bool($item)) {
+            $debug .= "bool(" . (intval($value) ? "true" : "false") . ")";
+        } elseif(is_numeric($item)) {
+            $debug .= "number(" . $value . ")";
+        } elseif(is_array($item)) {
+			$debug .=  "array(" . replace(
+				[
+					"{" => "{\n",
+					"}" => "\n}",
+					",\"" => ",\n\""
+				],
+				json_encode($item)
+			) . ")";
+		} else {
+			$debug .= $value . "\n";
+		}
+	}
+
+    $debug .= "</pre>";
+
+    echo $debug;
+
+    $backtrace_array = debug_backtrace();
+    $backtrace = "<pre style='background-color:#f0f3;padding:10px;'>";
+    foreach($backtrace_array as $stack => $trace) {
+    	$file = @$trace["file"];
+    	$function = @$trace["function"];
+    	$line = @$trace["line"];
+    	$class = @$trace["class"];
+
+    	$tmp = "";
+
+    	if($file || $class) {
+    		$tmp .= "<i>";
+
+    		if($file) {
+    			$tmp .= "$file";
+    		}
+
+    		if($file && $class) {
+    			$tmp .= "/$class";
+    		} elseif($class) {
+    			$tmp .= "$class";
+    		}
+
+    		$tmp .= "</i>->";
+    	}
+
+    	if($function) {
+    		$tmp .= "<b>$function</b>";
+    	}
+
+    	if($line) {
+    		$tmp .= " at line $line";
+    	}
+
+    	$backtrace .= "<p style='margin:0;padding:0;font-size:13px;'>[$stack] $tmp</p>\n";
+    }
+    $backtrace .= "<pre>";
+    echo $backtrace;
+}
+
+function dd(...$items) {
+    dump(...$items);
+    die();
+}
+
 function contains(string $container, $target) {
     return strpos($container, $target) > -1 ? true : false;
 }
