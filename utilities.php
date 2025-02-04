@@ -94,6 +94,14 @@ function is_declared($variable, bool $check_non_empty_content = false) {
     return isset($variable);
 }
 
+function array_trim(array $target) {
+	return array_filter($target, function($item) {
+		if(!empty($item)) {
+			return $item;
+		}
+	});
+}
+
 function array_delast(array $target) {
     array_pop($target);
     return $target;
