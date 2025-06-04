@@ -526,3 +526,70 @@ function try_utf8_encode($string) {
 
     return $encoding ? iconv($encoding, 'UTF-8', $string) : $string;
 }
+
+/**
+ * @param string $tmpname
+ * @param string $filename
+ * @return bool
+ */
+function is_pdf($tmpname, $filename) {
+    if(!file_exists($tmpname)) {
+        return false;
+    }
+
+    $handle = fopen($tmpname, "rb");
+    if(!$handle) {
+        return false;
+    }
+
+    $first_line = fgets($handle, 20);
+
+    fseek($handle, max(-1024, -filesize($tmpname)), SEEK_END);
+    $last_chunk = fread($handle, 1024);
+
+    fclose($handle);
+
+    /**
+     * we expect the very first line
+     * to be the pdf version used to create the document
+     * 
+     * example: %PDF-1.5
+     */
+    if(!preg_match("/^%PDF-[0-9]\.[0-9]$/", trim($first_line))) {
+        return false;
+    }
+
+    # looks for %%EOF at the end of the file
+    if(!preg_match("/%%EOF/", $last_chunk)) {
+        return false;
+    }
+
+    return preg_match("/\.pdf$/i", $filename);
+}
+
+/**
+ * checks the file header
+ * 
+ * @param string $tmpname
+ * @param string $filename
+ * @return bool
+ */
+function is_xls($tmpname, $filename) {
+    if(!file_exists($tmpname)) {
+        return false;
+    }
+
+    $handle = fopen($tmpname, "rb");
+    if(!$handle) {
+        return false;
+    }
+
+    $first_line = fread($handle, 512);
+    fclose($handle);
+
+    if(!str_contains($first_line, "[Content_Types].xml")) {
+        return false;
+    }
+
+    return preg_match("/\.xls[x]?$/", $filename);
+}
