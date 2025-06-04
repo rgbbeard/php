@@ -440,4 +440,77 @@ function bin2_ascii(string $bin) {
     
     return $ascii;
 }
-?>
+
+/**
+ * can be used in place of are_declared
+ * 
+ * @param mixed $variable
+ * @param array|bool $parent
+ * @param bool $check_non_empty_content
+ * @return bool
+ */
+function is_declared($variable, $parent = false, $check_non_empty_content = true) {
+	$empty_values = array("null", "0", "false");
+	$is_declared = isset($variable) && !@empty($variable);
+
+    if(is_array($variable)) {
+        return are_declared($variable, $parent, $check_non_empty_content);
+    } else {
+    	if($parent !== false) {
+    		if(!is_array($parent) || empty($parent)) {
+    			return false;
+    		}
+
+    		$is_declared = isset($parent[$variable]) && !@empty($parent[$variable]);
+    	}
+
+        if(!$check_non_empty_content) {
+        	return $parent !== false ? isset($parent[$variable]) : isset($variable);
+        }
+
+        if($is_declared) {
+        	return $parent !== false ?
+        		!in_array(trim(strtolower($parent[$variable])), $empty_values, true) :
+        		!in_array(trim(strtolower($variable)), $empty_values, true);
+        }
+    }
+
+    return $is_declared;
+}
+
+/**
+ * @param array $variable
+ * @param array|bool $parent
+ * @param bool $check_non_empty_content
+ * @return bool
+ */
+function are_declared($variables, $parent = false, $check_non_empty_content = true) {
+    $empty_values = array("null", "0", "false");
+    $is_declared = isset($variable) && !@empty($variable);
+
+    if(!is_array($variables)) {
+        return false;
+    }
+
+    foreach($variables as $v) {
+        if($parent != false) {
+            if(!is_array($parent) || empty($parent)) {
+                return false;
+            }
+
+            $is_declared = isset($parent[$v]) && !@empty($parent[$v]);
+        }
+
+        if(!$check_non_empty_content) {
+            return $parent !== false ? isset($parent[$v]) : isset($v);
+        }
+
+        if($is_declared) {
+            return $parent !== false ?
+                !in_array(trim(strtolower($parent[$v])), $empty_values, true) :
+                !in_array(trim(strtolower($v)), $empty_values, true);
+        }
+    }
+
+    return $is_declared;
+}
