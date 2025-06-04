@@ -514,3 +514,15 @@ function are_declared($variables, $parent = false, $check_non_empty_content = tr
 
     return $is_declared;
 }
+
+/** 
+ * references:
+ * https://www.php.net/manual/en/function.mb-detect-order.php
+ * https://www.php.net/manual/en/function.mb-detect-encoding
+ * https://www.php.net/manual/en/function.iconv.php
+ */
+function try_utf8_encode($string) {
+    $encoding = mb_detect_encoding($string, mb_detect_order(), true);
+
+    return $encoding ? iconv($encoding, 'UTF-8', $string) : $string;
+}
