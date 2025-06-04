@@ -19,7 +19,7 @@ class MySQL {
 		string $hostname = "mdb",
 		string $username = "admin",
 		string $password = "admin",
-		string $dbname = "serjeant_lite",
+		string $dbname = "dbname",
 		string $port = "3306"
 	) {
 		if(empty($this->connection) || !($this->connection instanceof PDO)) {
