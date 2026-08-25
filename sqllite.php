@@ -8,6 +8,8 @@ use \SQLite3Result;
 use \SQLite3Exception;
 
 class SQLLite {
+    protected const default_dbfilename = "mydb.sqlite";
+
     protected const modes_table = [
         "r+" => SQLITE3_OPEN_READWRITE,
         "c" => SQLITE3_OPEN_CREATE,
@@ -23,13 +25,17 @@ class SQLLite {
     public int $rows = 0;
 
     public function __construct(
-        string $dbfilename = "mydb.sqlite",
+        string $dbfilename = "",
         string $mode = "r+"
     ) {
         if(
             empty($this->connection) 
             || !($this->connection instanceof SQLite3)
         ) {
+            if(empty($dbfilename)) {
+                $dbfilename = $this->default_dbfilename;
+            }
+
             return $this->connect($dbfilename, $mode);
         }
         return $this->connection;
