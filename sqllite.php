@@ -17,13 +17,18 @@ class SQLLite {
     ];
 
     protected ?SQLite3 $connection = null;
-    protected ?SQLite3Stmt $prepare = null;
+    protected SQLite3Stmt|false|null $prepare = null;
     protected ?SQLite3Result $sqlresult = null;
     
     protected array $params = [];
     public array|false $result = [];
     public int $rows = 0;
 
+    /**
+     * @param string $dbfilename
+     * @param string $mode
+     * @return SQLite3|null
+     */
     public function __construct(
         string $dbfilename = "",
         string $mode = "r+"
@@ -33,11 +38,14 @@ class SQLLite {
             || !($this->connection instanceof SQLite3)
         ) {
             if(empty($dbfilename)) {
-                $dbfilename = $this->default_dbfilename;
+                $dbfilename = dirname(__FILE__) 
+                    . DIRECTORY_SEPARATOR 
+                    . self::default_dbfilename;
             }
 
             return $this->connect($dbfilename, $mode);
         }
+
         return $this->connection;
     }
 
@@ -72,17 +80,25 @@ class SQLLite {
         $this->clear_result();
     }
 
+    /**
+     * @return bool
+     */
     public function is_connected(): bool {
         return ($this->connection instanceof SQLite3);
     }
 
+    /**
+     * @param string $dbfilename
+     * @param string $mode
+     * @return SQLite3|null
+     */
     protected function connect(
         string $dbfilename,
         string $mode = "r+"
     ): ?SQLite3 {
         # No need to open connection manually
         try {
-            $m = in_array($mode, self::modes_table) ? 
+            $m = isset(self::modes_table[$mode]) ? 
                 self::modes_table[$mode] : self::modes_table["r+"];
 
             $this->connection = new SQLite3($dbfilename, $m);
@@ -92,12 +108,19 @@ class SQLLite {
         return $this->connection;
     }
     
+    /**
+     * @param array $parameters
+     */
     public function set_parameters(array $parameters) {
         foreach($parameters as $p => $v) {
             $this->params[$p] = $v;
         }
     }
     
+    /**
+     * @param string $parameter
+     * @param string|null $value
+     */
     public function set_parameter(string $parameter, ?string $value = null) {
         if(!empty($value)) {
             $this->params[$parameter] = $value;
@@ -110,7 +133,6 @@ class SQLLite {
      * https://www.php.net/manual/en/sqlite3stmt.bindvalue.php
      * 
      * @param SQLite3Stmt $statement
-     * @return void
      */
     protected function bind_named(SQLite3Stmt $statement) {
         if(!empty($this->params)) {
@@ -143,6 +165,11 @@ class SQLLite {
         }
     }
 
+    /**
+     * @param string $query
+     * @param array|null $parameters
+     * @return bool
+     */
     public function execute(string $query, ?array $parameters = []): bool {
         if(!empty($query)) {
             try {
@@ -155,6 +182,11 @@ class SQLLite {
                 }
 
                 $this->prepare = $this->connection->prepare($query);
+
+                if(!$this->prepare) {
+                    return false;
+                }
+
                 $this->bind_named($this->prepare);
                 
                 $this->sqlresult = $this->prepare->execute();
@@ -169,11 +201,14 @@ class SQLLite {
                 return (bool) $this->sqlresult;
             } catch(Exception $e) {
                 print_r($e->getMessage());
+                return false;
             }
         }
-        return false;
     }
 
+    /**
+     * @return string|false
+     */
     public function dump_sql(): string|false {
         if(!is_null($this->prepare)) {
             try {
@@ -184,19 +219,31 @@ class SQLLite {
         }
     }
     
+    /**
+     * @return array
+     */
     public function get_bound_params(): array {
         return $this->params;
     }
 
+    /**
+     * @return int
+     */
     public function get_rows(): int {
         return count($this->result);
     }
 
     /**
      * https://www.php.net/manual/en/sqlite3result.fetcharray.php
+     * 
+     * @return array
      */
     public function get_result() {
         try {
+            if(!$this->sqlresult) {
+                return [];
+            }
+
             while($result = $this->sqlresult->fetchArray(SQLITE3_ASSOC)) {
                 $this->result[] = $result;
             }
