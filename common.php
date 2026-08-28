@@ -184,10 +184,10 @@ if(!function_exists("str_contains")) {
 	}
 }
 
-if (!function_exists("array_first")) {
+if(!function_exists("array_first")) {
     /**
      * @param array $array
-     * @return mixed|null
+     * @return mixed
      */
     function array_first($array) {
         if(is_stdclass($array)) {
@@ -197,7 +197,7 @@ if (!function_exists("array_first")) {
         }
 
         if(!empty($array) && is_array($array)) {
-            return current(array_slice($array, 0, 1));
+            return array_shift($array);
         }
 
         return null;
