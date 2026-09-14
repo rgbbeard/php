@@ -280,7 +280,7 @@ function capitalize(string $target): string {
 }
 
 function is_email(string $target) {
-    return preg_match("/([a\.\--z\_]*[a0-z9]+@)([a-z]+\.)([a-z]{2,6})/", $target);
+    return preg_match("/^([a\.\--z\_]*[a0-z9]+@)([a-z]+\.)([a-z]{2,6})$/", $target);
 }
 
 function is_it_phone(string $target, bool $type = false) {
@@ -288,7 +288,7 @@ function is_it_phone(string $target, bool $type = false) {
         #Code to detect if it's mobile or phone
     }
     
-    return preg_match("/(\+\d{2})?((0\d{9})|(3\d{9,10}))/", $target);
+    return preg_match("/^(\+\d{2})?(((0\d)\d{8})|((3\d{2})\d{7,8}))$/", $target);
 }
 
 function is_it_fcode(string $target) {
