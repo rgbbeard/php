@@ -288,7 +288,7 @@ function is_it_phone(string $target, bool $type = false) {
         #Code to detect if it's mobile or phone
     }
     
-    return preg_match("/((3|0)([0-9]+){9,})/", $target);
+    return preg_match("/(\+\d{2})?((0\d{9})|(3\d{9,10}))/", $target);
 }
 
 function is_it_fcode(string $target) {
